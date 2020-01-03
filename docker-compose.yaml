@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  master:
+    image: mysql:8.0
+    volumes:
+      - db-data-master:/var/lib/mysql:rw
+      - ./master/config/:/etc/mysql/conf.d
+      - ./master/dump/:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - "3306:3306"
+    command: ['--default-authentication-plugin=mysql_native_password']
+
+  slave:
+    image: mysql:8.0
+    volumes:
+      - db-data-slave:/var/lib/mysql:rw
+      - ./slave/config/:/etc/mysql/conf.d
+      - ./slave/dump/:/docker-entrypoint-initdb.d
+    depends_on:
+      - master
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
+volumes:
+  db-data-master: {}
+  db-data-slave: {}
